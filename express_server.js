@@ -1,9 +1,11 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
+
 const cookieParser = require('cookie-parser')
 
 const bodyParser = require("body-parser");
+
 const users = {};
 
 app.set("view engine", "ejs");
@@ -13,6 +15,16 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const generateRandomString = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let randomString = '';
+  
+  while (randomString.length < 6) {
+    randomString += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return randomString;
+};
+
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser())
@@ -20,7 +32,6 @@ app.use(cookieParser())
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
-
 
 app.get("/urls.json", (req, res) => {
     res.json(urlDatabase);
@@ -36,7 +47,7 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
-//generates a shortURL then database and redirects /urls/shortURL
+//Make a shortURL then database and redirects /urls/shortURL
 app.post('/urls', (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
@@ -74,7 +85,7 @@ app.get('/u/:shortURL', (req, res) => {
     res.redirect(urlDatabase[req.params.shortURL]);
   } else {
     res.statusCode = 404;
-    res.send('<h2>404 Not Found<br>This short URL does not exist.</h2>')
+    res.send('<h2>404 Not Found<br>This short URL does not exist Sorry!.</h2>')
   }
 });
 
@@ -96,7 +107,6 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 })
 
-
 // registration page
 app.get('/register', (req, res) => {
   let templateVars = {user: users[req.cookies['user_id']]};
@@ -104,9 +114,16 @@ app.get('/register', (req, res) => {
 });
 // register functionality
 app.post('/register', (req, res) => {
-  if (req.body.email && req.body.password) {
-    if (!findEmailInDatabase(req.body.email)) {
-      const userID = generateRandomString();
+  const userID = generateRandomString();
+  users[userID] = {
+    userID,
+    email: req.body.email,
+    password: req.body.password
+  }
+  res.cookie('user_id', userID);
+  res.redirect('/urls');
+});
+
 
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
@@ -127,3 +144,7 @@ app.get('/', function (req, res) {
   // Cookies that have been signed
   console.log('Signed Cookies: ', req.signedCookies)
 })
+
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}`);
+});
