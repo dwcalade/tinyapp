@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 const urlDatabase = {};
 const users = {};
-
+const { getUserByEmail, generateRandomString } = require('./helpers');
 
 
 app.set("view engine", "ejs");
@@ -21,25 +21,6 @@ app.set("view engine", "ejs");
 //   "b2xVn2": "http://www.lighthouselabs.ca",
 //   "9sm5xK": "http://www.google.com"
 // }; Change for tomorrows sessions
-
-const generateRandomString = () => {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let randomString = '';
-  
-  while (randomString.length < 6) {
-    randomString += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return randomString;
-};
-
-const findUserWithEmailInDatabase = (email, database) => {
-  for (const user in database) {
-    if (database[user].email === email) {
-      return database[user];
-    }
-  }
-  return undefined;
-};
 
 const urlsForUser = (id) => {
   let userUrls = {};
@@ -56,7 +37,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls.json", (req, res) => {
-    res.json(urlDatabase);
+    res.json(users);
 });
 
 app.get("/hello", (req, res) => {
@@ -139,7 +120,7 @@ app.get('/login', (req, res) => {
 
 // Login 
 app.post('/login', (req, res) => {
-  const user = findUserWithEmailInDatabase(req.body.email, users);
+  const user = getUserByEmail(req.body.email, users);
   if (user) {
     if (bcrypt.compareSync(req.body.password, user.password)) {
       req.session.user_id = user.userID;
@@ -170,7 +151,7 @@ app.get('/register', (req, res) => {
 // register functionality
 app.post('/register', (req, res) => {
   if (req.body.email && req.body.password) {
-    if (!findUserWithEmailInDatabase(req.body.email, users)) {
+    if (!getUserByEmail(req.body.email, users)) {
       const userID = generateRandomString();
       users[userID] = {
         userID,
