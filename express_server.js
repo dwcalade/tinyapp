@@ -5,20 +5,22 @@ const PORT = 8080; // default port 8080
 const cookieSession = require('cookie-session');
 app.use(cookieSession({name: 'session'}));
 
+const bcrypt = require('bcryptjs');
+
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
 const urlDatabase = {};
 const users = {};
 
-const bcrypt = require('bcrypt');
+
 
 app.set("view engine", "ejs");
 
 // const urlDatabase = {
 //   "b2xVn2": "http://www.lighthouselabs.ca",
 //   "9sm5xK": "http://www.google.com"
-// };
+// }; Change for tomorrows sessions
 
 const generateRandomString = () => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
