@@ -19,33 +19,6 @@ const users = {};
 
 app.set("view engine", "ejs");
 
-// const urlDatabase = {
-//   "b2xVn2": "http://www.lighthouselabs.ca",
-//   "9sm5xK": "http://www.google.com"
-// }; Change for tomorrows sessions
-
-// const urlsForUser = (id) => {
-//   let userUrls = {};
-//   for (const shortURL in urlDatabase) {
-//     if (urlDatabase[shortURL].userID === id) {
-//       userUrls[shortURL] = urlDatabase[shortURL];
-//     }
-//   }
-//   return userUrls;
-// };
-
-// app.get("/", (req, res) => {
-//   res.send("Hello!");
-// });
-
-// app.get("/urls.json", (req, res) => {
-//     res.json(users);
-// });
-
-// app.get("/hello", (req, res) => {
-//     res.send("<html><body>Hello <b>World</b></body></html>\n");
-// });
-
 // URL index page
 app.get('/urls', (req, res) => {
   const userID = req.session.userID;
