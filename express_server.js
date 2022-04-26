@@ -72,7 +72,7 @@ app.post('/urls/:shortURL', (req, res) => {
 // deletes a url from database, redirects to index page
 app.post('/urls/:shortURL/delete', (req, res) => {
   const shortURL = req.params.shortURL;
-  if (req.session.user_id === urlDatabase[shortURL].userID) {
+  if (req.session.userID === urlDatabase[shortURL].userID) {
     delete urlDatabase[shortURL];
   }
 
@@ -129,6 +129,7 @@ app.post('/logout', (req, res) => {
 app.get('/register', (req, res) => {
   if (req.session.userID) {
     res.redirect('/urls');
+    console.log('Hello');
     return;
   }
   const templateVars = {user: users[req.session.userID]}
