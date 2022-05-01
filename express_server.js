@@ -1,3 +1,5 @@
+
+  
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port is 8080
@@ -15,7 +17,6 @@ const { getUserByEmail, generateRandomString, urlsForUser } = require('./helper'
 
 const urlDatabase = {};
 const users = {};
-
 
 app.set("view engine", "ejs");
 
@@ -51,7 +52,8 @@ app.get('/urls/new', (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const userID = req.session.userID;
-  const userUrls = urlsForUser(userID);
+  const userUrls = urlsForUser(userID, urlDatabase);
+  console.log(userUrls);
   let templateVars = { urls: userUrls, user: users[userID], shortURL: req.params.shortURL };
   res.render("urls_show", templateVars);
 });
@@ -81,9 +83,10 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
 
 app.get('/u/:shortURL', (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL].longURL;
+  console.log(longURL);
   if (longURL) {
-    res.redirect(urlDatabase[req.params.shortURL]);
+    res.redirect(longURL);
   } else {
     res.statusCode = 404;
     res.send('<h2>404 Not Found<br>This short URL does not exist Sorry!.</h2>')
@@ -92,7 +95,7 @@ app.get('/u/:shortURL', (req, res) => {
 
 // The Login page
 app.get('/login', (req, res) => {
-  if (req.session.userID) {
+  if (users[req.session.userID]) {
     res.redirect('/urls');
     return;
   }
@@ -104,6 +107,7 @@ app.get('/login', (req, res) => {
 // Login 
 app.post('/login', (req, res) => {
   const user = getUserByEmail(req.body.email, users);
+  console.log("This is the", user);
 
   if (user && bcrypt.compareSync(req.body.password, user.password)) {
     req.session.userID = user.userID;
@@ -127,7 +131,7 @@ app.post('/logout', (req, res) => {
 
 // registration page
 app.get('/register', (req, res) => {
-  if (req.session.userID) {
+  if (users[req.session.userID]) {
     res.redirect('/urls');
     console.log('Hello');
     return;
